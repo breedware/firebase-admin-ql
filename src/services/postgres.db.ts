@@ -99,7 +99,7 @@ export class PgBaseModel extends PgDatabase {
     // save item to firestore
     private async saveToFirestore(backupDb: string, dbLabel: string, data: object, key?: string | string[],   firestorReference?: string){
         const fireDb = new FirebaseModel(backupDb, this.firestoreDB);
-        const reference = await fireDb.doBackup({
+        await fireDb.doBackup({
             whereKey: key,
             returnData: data,
             dbLabel,

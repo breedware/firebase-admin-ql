@@ -86,11 +86,12 @@ export const chainMiddlewares = async (
  * @returns {CallableFunction<any, Promise<Message | { status: string; message: string }>, unknown>} - 
  *          A Firebase Callable Function with middleware for app confirmation and optional user authentication.
  */
-export const callableFunctionWrapper = (callback: (request: CallableRequest<any>)=>Promise<Message>, withAuth: boolean = false): CallableFunction<any, Promise<Message | { status: string; message: string; data?: any}>, unknown> => {
+export const callableFunctionWrapper = (callback: (request: CallableRequest<any>)=>Promise<Message>, withAuth: boolean = false, maxInstances?: number): CallableFunction<any, Promise<Message | { status: string; message: string; data?: any}>, unknown> => {
     return onCall(
       {
         timeoutSeconds: 120,
         enforceAppCheck: true,
+        maxInstances: maxInstances
       },
       async (request) => {
         try {
