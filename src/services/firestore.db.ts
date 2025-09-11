@@ -176,19 +176,19 @@ export class FirebaseModel {
      * @param {string | undefined} id - The optional document ID. If not provided, a new document is created.
      * @returns {Promise<boolean>} Resolves to `true` if the operation was successful, or `false` if an error occurred.
      */
-    async addToArray(data: any[], id?: string): Promise<boolean> {
+    async addToArray(data: any[], key: string, id?: string,): Promise<boolean> {
       try {
         if (id) {
           const dataExist = await this.dataExists(id);
           if (dataExist) {
             await this.collection.doc(id).update({
-              data: FieldValue.arrayUnion(...data),
+              [key]: FieldValue.arrayUnion(...data),
             });
           } else {
-            await this.collection.doc(id).set({ data });
+            await this.collection.doc(id).set({ [key]: data });
           }
         } else {
-          await this.collection.add({ data });
+          await this.collection.add({[key]:  data });
         }
         return true;
       } catch (error) {
