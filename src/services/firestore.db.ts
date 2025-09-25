@@ -222,34 +222,45 @@ export class FirebaseModel {
         if (!dataToBackup || (typeof dataToBackup === 'object' && Object.keys(dataToBackup).length === 0) || dataToBackup === '') {
           return false;
         }
-    
-        let ref = reference;
+
+        const saveData = async(data: any)=>{
+          let ref = reference;
         
-        if (!ref && whereKey) {
-          const where: whereClause[] = [];
-          if (typeof whereKey === "string") {
-            where.push({
-              key: whereKey,
-              operator: "==",
-              value: dataToBackup[whereKey],
-            });
-          } else {
-            whereKey.forEach((key) => {
+          if (!ref && whereKey) {
+            const where: whereClause[] = [];
+            if (typeof whereKey === "string") {
               where.push({
-                key,
+                key: whereKey,
                 operator: "==",
-                value: dataToBackup[key],
+                value: data[whereKey],
               });
-            });
+            } else {
+              whereKey.forEach((key) => {
+                where.push({
+                  key,
+                  operator: "==",
+                  value: data[key],
+                });
+              });
+            }
+            const itemExist = await this.findWhere({ wh: where });
+            if (itemExist.length > 0) {
+              ref = itemExist[0].reference;
+            }
           }
-          const itemExist = await this.findWhere({ wh: where });
-          if (itemExist.length > 0) {
-            ref = itemExist[0].reference;
-          }
+      
+          // Backup return value to Firestore
+          return await this.save(data, ref);
+        }
+
+        if(Array.isArray(dataToBackup)){
+          const saved = await Promise.all(dataToBackup.map(data=>saveData(data)));
+          return saved.every(item=>item!==false);
+        } else {
+          return saveData(dataToBackup);
         }
     
-        // Backup return value to Firestore
-        return await this.save(dataToBackup, ref);
+        
       } catch (error) {
         logger.log("firestore backup error: ", error);
         return false;
