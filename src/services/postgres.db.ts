@@ -68,6 +68,7 @@ export class PgBaseModel extends PgDatabase {
                 this.procedure,
                 pgForm.values
             );
+            logger.log("return value: ", returnValue);
 
             // If the stored procedure was successful and backup parameters are provided, back up data to Firestore
             if (returnValue.status === 'success' && backups) {
