@@ -1,6 +1,6 @@
 import { logger } from "firebase-functions/v2";
 import { Message } from "../utility";
-import { CallableRequest, onCall, CallableFunction } from "firebase-functions/https";
+import { CallableRequest, onCall, CallableFunction } from "firebase-functions/v2/https";
 
 /**
  * Middleware function to verify if the request is from an App Check verified app.
