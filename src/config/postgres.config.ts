@@ -20,27 +20,7 @@ export class PgDatabase {
     this.schema = schema;
   }
 
-  /**
-   * Checks if a stored procedure exists in the database.
-   * @param methodName - The name of the stored procedure.
-   * @returns A boolean indicating whether the procedure exists.
-   */
-  private async procedureExists(methodName: string): Promise<boolean> {
-    const query = `
-      SELECT EXISTS (
-        SELECT 1 FROM pg_proc p
-        JOIN pg_namespace n ON p.pronamespace = n.oid
-        WHERE n.nspname = ? AND p.proname = ?
-      ) AS exists;
-    `;
-    try {
-      const result = await this.db.raw(query, [this.schema, methodName]);
-      return result.rows[0]?.exists || false;
-    } catch (error) {
-      logger.error(`Error checking procedure existence: ${error}`);
-      return false;
-    }
-  }
+  
 
   /**
    * Executes a stored procedure in the database.
@@ -50,10 +30,6 @@ export class PgDatabase {
    * @throws If the procedure does not exist or execution fails.
    */
   async runStoredMethod(methodName: string, parameters: any[]): Promise<Message> {
-    const exists = await this.procedureExists(methodName);
-    if (!exists) {
-        throw new Error(`Stored procedure ${this.schema}.${methodName} does not exist.`);
-    }
 
     if (!Array.isArray(parameters) || parameters.length === 0) {
         throw new Error(`Stored procedure ${this.schema}.${methodName} expects parameters but received none.`);
@@ -73,7 +49,7 @@ export class PgDatabase {
         logger.error(`Error executing stored method: ${error}`);
         throw new Error("Unable to execute transaction: " + error);
     } finally {
-      this.db.destroy();
+      // this.db.destroy();
     }
 }
 
